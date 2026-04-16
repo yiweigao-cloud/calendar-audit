@@ -1,0 +1,25 @@
+.github/workflows/check-calendar-changes.yml
+  492e6156418aceb4 1-135
+index.html
+  492e6156418aceb4 179-187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "e6fb09c2c566c8fb7100d08ffe2299ac562ac469",
+  "prompts": {
+    "492e6156418aceb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "15a71412-c41b-44f8-becb-b3a97f53e47e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "yiweigao-cloud",
+      "messages": [],
+      "total_additions": 144,
+      "total_deletions": 0,
+      "accepted_lines": 144,
+      "overriden_lines": 0
+    }
+  }
+}
