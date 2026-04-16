@@ -176,6 +176,15 @@ document.querySelectorAll('.tab').forEach(tab => {
       });
       textEl.textContent = 'Last updated: ' + formatted;
 
+      // Check if any entries need screenshot refresh.
+      var needsRefresh = entries.some(function(e) { return e.screenshots_current === false; });
+      if (needsRefresh) {
+        var badge = document.createElement('span');
+        badge.style.cssText = 'background:#FFF6E9;color:#925600;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-left:8px;';
+        badge.textContent = 'Screenshots may be outdated';
+        textEl.appendChild(badge);
+      }
+
       // Show the toggle button.
       toggleBtn.style.display = 'inline';
 

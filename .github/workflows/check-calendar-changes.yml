@@ -1,0 +1,135 @@
+name: Check for calendar changes
+
+on:
+  schedule:
+    # Run daily at 9am ET (1pm UTC)
+    - cron: '0 13 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout audit repo
+        uses: actions/checkout@v4
+
+      - name: Fetch Headway calendar file history
+        env:
+          GH_TOKEN: ${{ secrets.HEADWAY_PAT }}
+        run: |
+          set -euo pipefail
+
+          LAST_HASH=$(tr -d '[:space:]' < last-sync.txt)
+          echo "Last synced: $LAST_HASH"
+
+          # Get recent commits on main that touch calendar files.
+          # Uses the GitHub API so we don't need to clone the full repo.
+          COMMITS=$(gh api "repos/headway/headway/commits" \
+            --method GET \
+            -f sha=main \
+            -f path="web/apps/sigmund/app/legacy/views/Calendar" \
+            -f per_page=50 \
+            --jq '.[] | "\(.sha)||\(.commit.message | split("\n") | .[0])||\(.commit.author.name)||\(.commit.author.date)"' \
+            2>/dev/null || echo "")
+
+          if [ -z "$COMMITS" ]; then
+            echo "No commits found or API error. Exiting."
+            exit 0
+          fi
+
+          # Filter to only commits after our last sync.
+          FOUND_LAST=false
+          NEW_COMMITS=""
+          while IFS= read -r line; do
+            HASH=$(echo "$line" | cut -d'|' -f1)
+            if [ "$HASH" = "$LAST_HASH" ]; then
+              FOUND_LAST=true
+              break
+            fi
+            NEW_COMMITS="${NEW_COMMITS}${line}"$'\n'
+          done <<< "$COMMITS"
+
+          if [ -z "$NEW_COMMITS" ]; then
+            echo "No new calendar changes since last sync."
+            exit 0
+          fi
+
+          COMMIT_COUNT=$(echo -n "$NEW_COMMITS" | grep -c '^' || true)
+          echo "Found $COMMIT_COUNT new calendar commit(s)"
+
+          # Get the latest main HEAD for updating last-sync.
+          LATEST_HASH=$(echo "$NEW_COMMITS" | head -1 | cut -d'|' -f1)
+
+          # Update changelog.json with new entries.
+          python3 << 'PYEOF'
+          import json, sys, re
+
+          with open("changelog.json", "r") as f:
+              existing = json.load(f)
+
+          seen = {e["hash"] for e in existing}
+          new_entries = []
+
+          commits_raw = """$NEW_COMMITS""".strip()
+          for line in commits_raw.split("\n"):
+              if not line.strip():
+                  continue
+              parts = line.split("||")
+              if len(parts) < 4:
+                  continue
+              hash_val = parts[0]
+              title = parts[1]
+              author = parts[2]
+              date = parts[3]
+
+              if hash_val in seen:
+                  continue
+
+              pr_match = re.search(r'\(#(\d+)\)', title)
+              pr_number = pr_match.group(1) if pr_match else None
+              pr_url = f"https://github.com/headway/headway/pull/{pr_number}" if pr_number else None
+
+              new_entries.append({
+                  "hash": hash_val,
+                  "title": title,
+                  "author": author,
+                  "date": date,
+                  "pr_number": pr_number,
+                  "pr_url": pr_url,
+                  "screenshots_current": False
+              })
+
+          # Prepend new entries (newest first).
+          combined = new_entries + existing
+
+          with open("changelog.json", "w") as f:
+              json.dump(combined, f, indent=2)
+
+          print(f"Added {len(new_entries)} new changelog entries")
+
+          # Write a flag so the HTML can show "screenshots need refresh"
+          needs_refresh = any(not e.get("screenshots_current", True) for e in combined)
+          if needs_refresh:
+              print("⚠ Screenshots need refresh — run update.sh locally")
+          PYEOF
+
+          # Update last-sync.txt
+          echo "$LATEST_HASH" > last-sync.txt
+          echo "Updated last-sync.txt to $LATEST_HASH"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add changelog.json last-sync.txt
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Auto-update changelog: new calendar changes detected
+
+          Run update.sh locally to refresh screenshots."
+          git push
