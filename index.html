@@ -32,6 +32,79 @@
     border-radius: 0 0 8px 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
+  /* Changelog banner */
+  .changelog-banner {
+    background: #F0F2F5;
+    border: 1px solid #DADCE0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #555;
+  }
+  .changelog-banner .last-updated {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .changelog-banner .last-updated span {
+    color: #717171;
+  }
+  .changelog-banner .toggle-btn {
+    background: none;
+    border: none;
+    color: #1a73e8;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+    font-weight: 500;
+  }
+  .changelog-banner .toggle-btn:hover {
+    text-decoration: underline;
+  }
+  .changelog-entries {
+    display: none;
+    margin-top: 10px;
+    border-top: 1px solid #DADCE0;
+    padding-top: 10px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .changelog-entries.open {
+    display: block;
+  }
+  .changelog-entry {
+    padding: 6px 0;
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    line-height: 1.5;
+  }
+  .changelog-entry + .changelog-entry {
+    border-top: 1px solid #EAECEF;
+  }
+  .changelog-entry .entry-date {
+    flex-shrink: 0;
+    color: #888;
+    font-size: 12px;
+    min-width: 90px;
+  }
+  .changelog-entry .entry-title {
+    flex: 1;
+    color: #353535;
+  }
+  .changelog-entry .entry-title a {
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  .changelog-entry .entry-title a:hover {
+    text-decoration: underline;
+  }
+  .changelog-entry .entry-author {
+    flex-shrink: 0;
+    color: #999;
+    font-size: 12px;
+  }
 </style>
 </head>
 <body>
@@ -41,6 +114,14 @@
     Pixel-perfect reference of every calendar block, event detail popover, and guidance card combination
     in the Headway provider calendar. Rendered with real Helix components.
   </p>
+
+  <div class="changelog-banner" id="changelog-banner">
+    <div class="last-updated">
+      <span id="last-updated-text">Loading changelog...</span>
+      <button class="toggle-btn" id="changelog-toggle" style="display:none;">View changelog</button>
+    </div>
+    <div class="changelog-entries" id="changelog-entries"></div>
+  </div>
 
   <div class="tabs">
     <button class="tab active" data-tab="status">By Status</button>
@@ -63,6 +144,7 @@
   </div>
 </div>
 <script>
+// Tab switching.
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -71,6 +153,77 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
   });
 });
+
+// Changelog banner.
+(function() {
+  var textEl = document.getElementById('last-updated-text');
+  var toggleBtn = document.getElementById('changelog-toggle');
+  var entriesEl = document.getElementById('changelog-entries');
+
+  fetch('changelog.json')
+    .then(function(r) { return r.ok ? r.json() : []; })
+    .then(function(entries) {
+      if (!entries || entries.length === 0) {
+        textEl.textContent = 'No changes tracked yet';
+        return;
+      }
+
+      // Format the most recent date.
+      var latest = entries[0];
+      var d = new Date(latest.date);
+      var formatted = d.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric'
+      });
+      textEl.textContent = 'Last updated: ' + formatted;
+
+      // Show the toggle button.
+      toggleBtn.style.display = 'inline';
+
+      // Build entries.
+      entries.forEach(function(entry) {
+        var row = document.createElement('div');
+        row.className = 'changelog-entry';
+
+        var dateSpan = document.createElement('span');
+        dateSpan.className = 'entry-date';
+        var ed = new Date(entry.date);
+        dateSpan.textContent = ed.toLocaleDateString('en-US', {
+          month: 'short', day: 'numeric'
+        });
+
+        var titleSpan = document.createElement('span');
+        titleSpan.className = 'entry-title';
+        if (entry.pr_url && entry.pr_number) {
+          var link = document.createElement('a');
+          link.href = entry.pr_url;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = entry.title;
+          titleSpan.appendChild(link);
+        } else {
+          titleSpan.textContent = entry.title;
+        }
+
+        var authorSpan = document.createElement('span');
+        authorSpan.className = 'entry-author';
+        authorSpan.textContent = entry.author;
+
+        row.appendChild(dateSpan);
+        row.appendChild(titleSpan);
+        row.appendChild(authorSpan);
+        entriesEl.appendChild(row);
+      });
+
+      // Toggle expand/collapse.
+      toggleBtn.addEventListener('click', function() {
+        var open = entriesEl.classList.toggle('open');
+        toggleBtn.textContent = open ? 'Hide changelog' : 'View changelog';
+      });
+    })
+    .catch(function() {
+      textEl.textContent = 'No changes tracked yet';
+    });
+})();
 </script>
 </body>
 </html>
