@@ -6,187 +6,31 @@
 <title>Calendar Event Visual Audit</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    /* Background */
-    --bg-primary: #FFFFFF;
-    --bg-secondary: #F8F8F8;
-    --bg-tertiary: #EBEBEB;
-    --bg-info: #E8F3FF;
-    --bg-info-hover: #A2D0FE;
-    --bg-warning: #FFF6E9;
-    --bg-warning-hover: #FFDEB0;
-    --bg-success: #ebfcf4;
-    --bg-selected-hover: #A1DDC1;
-    /* Border */
-    --border-primary: #DADCE0;
-    --border-tertiary: #353535;
-    --border-info: #0E5297;
-    --border-warning: #925600;
-    --border-success: #4eaa6c;
-    /* Foreground */
-    --fg-primary: #353535;
-    --fg-secondary: #717171;
-    --fg-disabled: #BEBEBE;
-    --fg-warning: #F09E29;
-    --fg-warning-secondary: #925600;
-    --fg-info-secondary: #0E5297;
-    --fg-compliance: #13AA65;
-    --fg-danger-secondary: #9E2515;
-    /* Guidance card backgrounds */
-    --card-error-bg: #FFF0EE;
-    --card-error-border: #9E2515;
-    --card-warning-bg: #FFF6E9;
-    --card-warning-border: #925600;
-    --card-compliance-bg: #EEFBF3;
-    --card-compliance-border: #13AA65;
-    --card-neutral-bg: #F8F8F8;
-    --card-neutral-border: #DADCE0;
-    --card-info-bg: #E8F3FF;
-    --card-info-border: #0E5297;
-  }
-
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: var(--fg-primary);
-    background: var(--bg-secondary);
-    line-height: 1.5;
+    color: #353535; background: #F8F8F8;
   }
-
-  .page { max-width: 1200px; margin: 0 auto; padding: 24px; }
-
+  .page { max-width: 1440px; margin: 0 auto; padding: 24px; }
   h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-  h2 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
-  h3 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
-
-  .subtitle { color: var(--fg-secondary); font-size: 14px; margin-bottom: 24px; max-width: 900px; }
-  .description { color: var(--fg-secondary); font-size: 13px; margin-bottom: 16px; }
-
-  /* Tabs */
-  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border-primary); margin-bottom: 24px; }
+  .subtitle { color: #717171; font-size: 14px; margin-bottom: 24px; max-width: 900px; }
+  .tabs {
+    display: flex; gap: 4px; border-bottom: 1px solid #DADCE0;
+    margin-bottom: 0; position: sticky; top: 0; z-index: 10;
+    background: #F8F8F8; padding-top: 8px;
+  }
   .tab {
-    padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer;
-    border: none; background: none; color: var(--fg-secondary);
+    padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
+    border: none; background: none; color: #717171;
     border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s;
   }
-  .tab:hover { color: var(--fg-primary); }
-  .tab.active { color: var(--fg-primary); border-bottom-color: var(--fg-primary); }
-
+  .tab:hover { color: #353535; }
+  .tab.active { color: #353535; border-bottom-color: #353535; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
-
-  /* Section groups */
-  .section-group { margin-bottom: 32px; }
-  .section-group-header { margin-bottom: 16px; }
-
-  /* Variant cards */
-  .variant-card {
-    border: 1px solid var(--border-primary); border-radius: 8px;
-    padding: 16px; margin-bottom: 16px; background: var(--bg-primary);
-  }
-  .variant-label { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
-  .variant-sublabel { font-size: 12px; color: var(--fg-secondary); margin-bottom: 12px; }
-
-  .variant-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
-  .variant-col { display: flex; flex-direction: column; gap: 8px; }
-  .variant-col-label { font-size: 12px; color: var(--fg-secondary); }
-
-  /* Calendar block */
-  .cal-block {
-    position: relative; min-height: 56px; padding: 8px; border-radius: 8px;
-    width: 260px; overflow: hidden;
-    box-shadow: rgba(18,18,18,0.1) 0px 4px 5px -1px, rgba(18,18,18,0.06) 0px 2px 4px -1px;
-  }
-  .cal-block-time { font-size: 11px; margin-bottom: 2px; }
-  .cal-block-header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .cal-block-title { font-size: 13px; font-weight: 600; }
-  .cal-block-subtitle { font-size: 10px; font-weight: 500; margin-top: 1px; }
-  .cal-block-icon { flex-shrink: 0; width: 18px; height: 18px; }
-  .cal-block-canceled .cal-block-title { text-decoration: line-through; }
-
-  /* Block color classes */
-  .block-blue { background: var(--bg-info); border: 1px solid var(--border-info); }
-  .block-green { background: var(--bg-success); border: 1px solid var(--border-success); }
-  .block-yellow { background: var(--bg-warning); border: 1px solid var(--border-warning); }
-  .block-gray { background: var(--bg-secondary); border: 1px solid var(--border-primary); }
-  .block-unavail { background: var(--bg-secondary); border: 1px solid #dcdcdc; border-radius: 0; }
-  .block-slot { background: #353535; opacity: 0.5; border: none; border-radius: 0; color: white; }
-  .block-avail {
-    background: repeating-linear-gradient(0deg, hsl(0,0%,92%), hsl(0,0%,92%) 1px, hsl(0,0%,98%) 1px, hsl(0,0%,98%) 20px);
-    border: none; box-shadow: none; min-height: 80px;
-  }
-
-  /* Popover */
-  .popover {
-    width: 420px; border: 1px solid var(--border-primary); border-radius: 8px;
-    background: var(--bg-primary); overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  }
-  .popover-title {
-    padding: 12px 16px; border-bottom: 1px solid var(--border-primary);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .popover-title-name { font-size: 15px; font-weight: 600; }
-  .popover-title-close { color: var(--fg-secondary); cursor: pointer; font-size: 18px; }
-
-  .popover-section { padding: 12px 16px; border-bottom: 1px solid var(--border-primary); }
-  .popover-section:last-child { border-bottom: none; }
-
-  .popover-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
-  .popover-row:last-child { margin-bottom: 0; }
-  .popover-icon { flex-shrink: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
-  .popover-icon svg { width: 16px; height: 16px; }
-  .popover-text { font-size: 14px; }
-
-  /* Guidance cards */
-  .guidance-card {
-    border-radius: 8px; padding: 12px 16px; font-size: 14px;
-    border-left: 4px solid; margin-top: 8px;
-  }
-  .guidance-error { background: var(--card-error-bg); border-left-color: var(--card-error-border); }
-  .guidance-warning { background: var(--card-warning-bg); border-left-color: var(--card-warning-border); }
-  .guidance-compliance { background: var(--card-compliance-bg); border-left-color: var(--card-compliance-border); }
-  .guidance-neutral { background: var(--card-neutral-bg); border-left-color: var(--card-neutral-border); }
-  .guidance-info { background: var(--card-info-bg); border-left-color: var(--card-info-border); }
-
-  /* Card catalog */
-  .card-catalog-item { margin-bottom: 16px; }
-  .card-meta { font-size: 12px; color: var(--fg-secondary); margin-bottom: 4px; }
-  .card-standalone { max-width: 420px; }
-
-  /* Status badge */
-  .status-badge {
-    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px;
-    border-radius: 4px; margin-right: 4px; margin-bottom: 4px;
-  }
-  .badge-blue { background: var(--bg-info); color: var(--border-info); }
-  .badge-green { background: var(--bg-success); color: var(--border-success); }
-  .badge-yellow { background: var(--bg-warning); color: var(--border-warning); }
-  .badge-gray { background: var(--bg-tertiary); color: var(--fg-secondary); }
-  .badge-error { background: var(--card-error-bg); color: var(--card-error-border); }
-
-  /* Buttons (non-functional, for display) */
-  .popover-btn {
-    display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
-    border-radius: 6px; font-size: 13px; font-weight: 500; border: 1px solid var(--border-primary);
-    background: var(--bg-primary); color: var(--fg-primary); cursor: default;
-  }
-  .popover-btn-primary { background: var(--fg-primary); color: white; border-color: var(--fg-primary); }
-  .popover-buttons { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; }
-
-  /* Legend */
-  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; padding: 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-primary); }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-  .legend-swatch { width: 24px; height: 16px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.15); }
-
-  /* Icon SVGs */
-  .icon { display: inline-flex; vertical-align: middle; }
-  .icon svg { width: 16px; height: 16px; }
-
-  @media (max-width: 800px) {
-    .variant-row { flex-direction: column; }
-    .popover { width: 100%; }
-    .cal-block { width: 100%; }
+  .tab-panel img {
+    width: 100%; max-width: 1400px; height: auto; display: block;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
 </style>
 </head>
@@ -194,16 +38,9 @@
 <div class="page">
   <h1>Calendar Event Visual Audit</h1>
   <p class="subtitle">
-    A comprehensive visual catalog of every calendar block, event detail popover, and guidance card combination in the provider calendar.
-    This is a static reference — no backend needed.
+    Pixel-perfect reference of every calendar block, event detail popover, and guidance card combination
+    in the Headway provider calendar. Rendered with real Helix components.
   </p>
-
-  <div class="legend">
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--bg-info);border-color:var(--border-info)"></div> Blue — Active/In-Flight</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--bg-success);border-color:var(--border-success)"></div> Green — Confirmed/Paid</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--bg-warning);border-color:var(--border-warning)"></div> Yellow — Needs Action</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--bg-secondary);border-color:var(--border-primary)"></div> Gray — Inactive</div>
-  </div>
 
   <div class="tabs">
     <button class="tab active" data-tab="status">By Status</button>
@@ -212,312 +49,20 @@
     <button class="tab" data-tab="billing">By Billing / Insurance</button>
   </div>
 
-  <!-- ===================== TAB: By Status ===================== -->
   <div class="tab-panel active" id="tab-status">
-    <p class="description">All 15 <code>CalendarEventStatus</code> values, each showing the calendar block and popover with the base (no guidance card) state.</p>
+    <img src="tab-status.png" alt="All 15 CalendarEventStatus values with calendar blocks and popovers" loading="eager">
   </div>
-
-  <!-- ===================== TAB: By Time Horizon ===================== -->
   <div class="tab-panel" id="tab-time">
-    <p class="description">Statuses grouped by when the session occurs relative to now, showing how the calendar block and popover change across the appointment lifecycle.</p>
+    <img src="tab-time.png" alt="Statuses grouped by time horizon: upcoming, in progress, awaiting confirmation, confirmed/paid, canceled, non-session" loading="lazy">
   </div>
-
-  <!-- ===================== TAB: By Guidance Card ===================== -->
   <div class="tab-panel" id="tab-cards">
-    <p class="description">All 28 guidance cards organized by severity. Each card shows its visual style, the component that renders it, and which statuses it applies to.</p>
+    <img src="tab-cards.png" alt="All 28 guidance cards organized by severity: error, warning, compliance, neutral, info" loading="lazy">
   </div>
-
-  <!-- ===================== TAB: By Billing ===================== -->
   <div class="tab-panel" id="tab-billing">
-    <p class="description">How popovers differ across billing types and insurance statuses. Each scenario shows key statuses where the billing context changes what the provider sees.</p>
+    <img src="tab-billing.png" alt="Billing scenarios: in-network, out-of-network, self-pay, Anthem EAP, Medicaid, Military OneSource" loading="lazy">
   </div>
 </div>
-
 <script>
-// =========================================================================
-// DATA
-// =========================================================================
-const STATUSES = [
-  { id: 'scheduledBeforeSession', label: 'Scheduled (Before Session)', statusText: 'Scheduled', colorGroup: 'blue', icon: null, time: '2:00pm - 3:00pm', title: 'Jane Doe' },
-  { id: 'inProgress', label: 'In Progress', statusText: 'In progress', colorGroup: 'blue', icon: null, time: '11:30am - 12:30pm', title: 'Jane Doe' },
-  { id: 'scheduledAfterSession', label: 'Scheduled (After Session)', statusText: 'Ready to confirm', colorGroup: 'blue', icon: 'note', time: '10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'generatingNote', label: 'Generating Note', statusText: 'Generating note...', colorGroup: 'blue', icon: null, time: '10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'pendingSupervisorApproval', label: 'Pending Supervisor Approval', statusText: 'Pending supervisor approval', colorGroup: 'blue', icon: 'clock', time: '10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'supervisorEditsRequested', label: 'Supervisor Edits Requested', statusText: 'Supervisor requested edits', colorGroup: 'yellow', icon: 'warning', time: '10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'confirmed', label: 'Confirmed', statusText: 'Confirmed', colorGroup: 'green', icon: 'check', time: '10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'confirmedWithPaymentFailed', label: 'Confirmed (Payment Failed)', statusText: 'Payment failed', colorGroup: 'green', icon: 'warning', time: '10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'paid', label: 'Paid', statusText: 'Paid', colorGroup: 'green', icon: 'check', time: '3/24 10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'needsAttention', label: 'Needs Attention', statusText: 'Action required', colorGroup: 'yellow', icon: 'warning', time: '10:00am - 11:00am', title: 'Jane Doe' },
-  { id: 'pending', label: 'Pending', statusText: 'Pending session', colorGroup: 'yellow', icon: 'clockCountdown', time: '4/3 2:00pm - 3:00pm', title: 'Jane Doe' },
-  { id: 'canceled', label: 'Canceled', statusText: 'Canceled', colorGroup: 'gray', icon: 'x', time: '10:00am - 11:00am', title: 'Jane Doe', canceled: true },
-  { id: 'unavailable', label: 'Unavailable', statusText: null, colorGroup: 'unavail', icon: 'prohibit', time: '2:00pm - 4:00pm', title: 'Unavailable', isNonSession: true },
-  { id: 'availability', label: 'Availability', statusText: null, colorGroup: 'avail', time: '', title: 'Available', isNonSession: true, noPopover: true },
-  { id: 'calendarSlot', label: 'Calendar Slot', statusText: null, colorGroup: 'slot', time: '', title: '', isNonSession: true, noPopover: true },
-];
-
-const TIME_GROUPS = [
-  { label: 'Upcoming', desc: 'Sessions scheduled in the future, not yet started.', ids: ['scheduledBeforeSession', 'pending'] },
-  { label: 'In Progress', desc: 'Sessions currently happening.', ids: ['inProgress'] },
-  { label: 'Past — Awaiting Confirmation', desc: 'Sessions that have ended but need provider action before they can be billed.', ids: ['scheduledAfterSession', 'generatingNote', 'needsAttention', 'supervisorEditsRequested', 'pendingSupervisorApproval'] },
-  { label: 'Past — Confirmed / Paid', desc: 'Sessions that have been confirmed or fully paid out.', ids: ['confirmed', 'confirmedWithPaymentFailed', 'paid'] },
-  { label: 'Canceled', desc: 'Sessions that were canceled.', ids: ['canceled'] },
-  { label: 'Non-Session', desc: 'Calendar items that are not appointments.', ids: ['unavailable', 'availability', 'calendarSlot'] },
-];
-
-const GUIDANCE_CARDS = [
-  // Error
-  { id: 'failed_payment_retry', label: 'Failed payment retry (< 3 attempts)', cat: 'error', source: 'Status.tsx', statuses: ['confirmedWithPaymentFailed'], text: "Payment method was declined, but we'll try again on 03/15/2026. Session confirmation will be blocked if there are 3 failed attempts. Consider asking your client to update their payment method." },
-  { id: 'failed_payment_terminal', label: 'Failed payment (3+ attempts — terminal)', cat: 'error', source: 'Status.tsx', statuses: ['confirmedWithPaymentFailed'], text: 'Payment method was declined 3 times and session confirmation is now blocked for this client. Ask your client to update their payment method to resolve.' },
-  { id: 'provider_payment_denied', label: 'Provider payment denied', cat: 'error', source: 'Status.tsx', statuses: ['confirmed', 'paid'], text: 'Contact us to get this resolved.' },
-  { id: 'note_generation_failed', label: 'Note generation failed', cat: 'error', source: 'Documentation.tsx', statuses: ['scheduledAfterSession'], text: 'We had a problem generating the note. Confirm this session by using a summary, manual note, or signed note upload.' },
-  { id: 'ironclad_blocking', label: 'Ironclad blocking (30-day window)', cat: 'error', source: 'Additive', statuses: ['scheduledAfterSession', 'generatingNote', 'needsAttention'], text: 'To ensure you are paid in a timely manner, we only allow confirming session details for 30 days.' },
-  { id: 'not_credentialed', label: 'Not credentialed in state', cat: 'error', source: 'Exclusive chain', statuses: ['needsAttention'], text: "You're not credentialed in this client's state. Session confirmation is blocked until credentialing is complete." },
-  { id: 'license_error', label: 'Provider license error', cat: 'error', source: 'Exclusive chain', statuses: ['needsAttention'], text: 'Your license has expired or could not be verified. Please update your credentials to continue confirming sessions.' },
-  { id: 'ineligible_insurance', label: 'Ineligible insurance (OON / no MH benefits)', cat: 'error', source: 'Exclusive chain', statuses: ['scheduledBeforeSession', 'inProgress', 'scheduledAfterSession', 'generatingNote', 'needsAttention'], text: "This client's insurance plan is not eligible for in-network coverage. Consider switching to self-pay billing." },
-  { id: 'no_anthem_eap', label: 'No valid Anthem EAP authorization', cat: 'error', source: 'Exclusive chain', statuses: ['needsAttention'], text: 'There is no valid Anthem EAP authorization for this client. This session cannot be confirmed until an authorization is obtained.' },
-  { id: 'past_appointment_terminal_failure', label: 'Past appointment terminal payment failure', cat: 'error', source: 'Exclusive chain', statuses: ['needsAttention'], text: 'This client has previously unpaid sessions that need to be resolved before you can confirm any of their future sessions. Please ask them to update their payment method.' },
-  // Warning
-  { id: 'supervisor_edits', label: 'Supervisor edits requested', cat: 'warning', source: 'Status.tsx', statuses: ['supervisorEditsRequested'], text: 'Your supervisor shared feedback and requested changes on this session note.' },
-  { id: 'human_error', label: 'Human error — insurance mismatch', cat: 'warning', source: 'Exclusive chain', statuses: ['scheduledBeforeSession', 'inProgress', 'scheduledAfterSession', 'generatingNote', 'needsAttention'], text: "We weren't able to verify this client's insurance information. Please ask the client to double-check their details." },
-  { id: 'appointment_warning', label: 'Appointment warning (missing info)', cat: 'warning', source: 'Exclusive chain', statuses: ['needsAttention'], text: "This client is missing required information needed for session confirmation. We've reached out to them to resolve the issue." },
-  { id: 'missing_info', label: 'Missing info next steps', cat: 'warning', source: 'Exclusive chain', statuses: ['needsAttention'], text: 'This client is missing required information. Ask them to update their profile before the session.' },
-  { id: 'missing_address', label: 'Missing address — add location', cat: 'warning', source: 'Exclusive chain', statuses: ['scheduledBeforeSession', 'inProgress', 'scheduledAfterSession', 'generatingNote', 'needsAttention'], text: "We need this client's home address to submit claims. Ask them to add it to their profile." },
-  { id: 'insurance_outage', label: 'Insurance outage', cat: 'warning', source: 'Exclusive chain', statuses: ['scheduledBeforeSession', 'inProgress', 'scheduledAfterSession', 'generatingNote', 'needsAttention'], text: "We're experiencing issues verifying insurance for some clients. We're working on it — you can still confirm this session." },
-  { id: 'no_payment_methods', label: 'No verified payment methods', cat: 'warning', source: 'Exclusive chain', statuses: ['needsAttention'], text: 'This client has no valid payment methods on file. Ask them to add a payment method before confirming.' },
-  { id: 'ny_non_credit_card', label: 'NY patient needs non-credit card payment', cat: 'warning', source: 'Exclusive chain', statuses: ['needsAttention'], text: 'New York requires patients to have a non-credit card payment method (debit or bank account) for copay collection.' },
-  { id: 'billing_not_verified', label: 'Billing account not verified', cat: 'warning', source: 'Exclusive chain', statuses: ['needsAttention'], text: 'Your billing account has not been verified. Please complete verification so you can receive payments.' },
-  { id: 'treatment_plan_required', label: 'Treatment plan requirement', cat: 'warning', source: 'Exclusive chain', statuses: ['scheduledAfterSession', 'generatingNote', 'needsAttention'], text: 'A treatment plan is required to confirm this session. Please complete one before confirming.' },
-  { id: 'treatment_plan_expiring', label: 'Treatment plan expiration', cat: 'warning', source: 'Exclusive chain', statuses: ['scheduledAfterSession', 'generatingNote', 'needsAttention'], text: "This client's treatment plan will expire soon. Please renew it to avoid session confirmation being blocked." },
-  // Compliance
-  { id: 'military_onesource', label: 'Military OneSource guidance', cat: 'compliance', source: 'Status.tsx', statuses: ['confirmed'], text: 'This is a Military OneSource session. Please confirm details within your Military OneSource portal after confirming here.' },
-  { id: 'pending_referral', label: 'Pending referral alert', cat: 'compliance', source: 'Exclusive chain', statuses: ['pending'], text: 'This session was booked by a patient referral. The patient has not yet confirmed the appointment.' },
-  { id: 'referral_intake_call', label: 'Referral intake call alert', cat: 'compliance', source: 'Exclusive chain', statuses: ['pending'], text: 'This is a referral intake call. The client was referred to you and has an intake call scheduled.' },
-  { id: 'anthem_eap_info', label: 'Anthem EAP info', cat: 'compliance', source: 'Additive', statuses: ['all session statuses'], text: "This is an Anthem EAP session. The client's EAP benefits cover a limited number of sessions." },
-  { id: 'medicaid_info', label: 'Medicaid info', cat: 'compliance', source: 'Additive', statuses: ['all session statuses'], text: 'This client is using Medicaid. Ensure all session documentation meets Medicaid compliance requirements.' },
-  // Neutral
-  { id: 'unavailability_info', label: 'Unavailability info', cat: 'neutral', source: 'SessionInfo.tsx', statuses: ['unavailable'], text: 'Clients will not be able to book appointments with you during this time.' },
-  // Info
-  { id: 'pending_referral_detail', label: 'Pending referral detail', cat: 'info', source: 'Exclusive chain', statuses: ['pending'], text: "We sent this client a link to book with you. Once they complete booking, you'll see the session on your calendar." },
-];
-
-const CARD_CATEGORIES = [
-  { cat: 'error', label: 'Error', desc: 'Blocking issues that prevent session confirmation or payment.' },
-  { cat: 'warning', label: 'Warning', desc: 'Non-blocking issues that may need attention before or after the session.' },
-  { cat: 'compliance', label: 'Compliance', desc: 'Regulatory or program-specific guidance (EAP, Medicaid, Military OneSource).' },
-  { cat: 'neutral', label: 'Neutral', desc: 'Informational messages with no action required.' },
-  { cat: 'info', label: 'Info', desc: 'Supplementary detail cards that accompany other guidance.' },
-];
-
-const BILLING_SCENARIOS = [
-  { id: 'in_network', label: 'Insurance — In Network', desc: 'Standard in-network insurance appointment. The most common billing type.', statuses: ['scheduledBeforeSession', 'scheduledAfterSession', 'confirmed', 'needsAttention'] },
-  { id: 'oon', label: 'Insurance — Out of Network', desc: "Client has insurance but provider is not in-network. May show ineligible insurance card.", statuses: ['scheduledBeforeSession', 'needsAttention'] },
-  { id: 'no_remaining', label: 'Insurance — No Remaining Covered Sessions', desc: 'Client has exhausted covered sessions under their plan.', statuses: ['scheduledBeforeSession', 'needsAttention'] },
-  { id: 'self_pay', label: 'Self-Pay', desc: 'Client is paying out of pocket. No insurance verification required.', statuses: ['scheduledBeforeSession', 'scheduledAfterSession', 'confirmed', 'confirmedWithPaymentFailed'] },
-  { id: 'anthem_eap', label: 'Anthem EAP', desc: 'Employee Assistance Program through Anthem. Shows EAP compliance guidance card.', statuses: ['scheduledBeforeSession', 'scheduledAfterSession', 'confirmed', 'needsAttention'], extraCard: 'anthem_eap_info' },
-  { id: 'medicaid', label: 'Medicaid', desc: 'Medicaid-covered session. Shows Medicaid compliance guidance card.', statuses: ['scheduledBeforeSession', 'scheduledAfterSession', 'confirmed', 'needsAttention'], extraCard: 'medicaid_info' },
-  { id: 'mil_onesource', label: 'Military OneSource', desc: 'Military OneSource session. Shows compliance guidance card after confirmation.', statuses: ['scheduledBeforeSession', 'confirmed'], extraCard: 'military_onesource' },
-];
-
-// =========================================================================
-// SVG Icons
-// =========================================================================
-const ICONS = {
-  check: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--fg-compliance)"/><path d="M8 12l2.5 2.5L16 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  warning: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--fg-warning)"/><path d="M12 8v4m0 3h.01" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`,
-  x: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--fg-disabled)" stroke-width="2"/><path d="M15 9l-6 6m0-6l6 6" stroke="var(--fg-disabled)" stroke-width="2" stroke-linecap="round"/></svg>`,
-  clock: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="var(--fg-info-secondary)"/><path d="M12 7v5l3 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  clockCountdown: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--fg-warning-secondary)" stroke-width="2"/><path d="M12 7v5l3 3" stroke="var(--fg-warning-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  prohibit: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="rgba(0,0,0,0.54)" stroke-width="2"/><line x1="5" y1="19" x2="19" y2="5" stroke="rgba(0,0,0,0.54)" stroke-width="2"/></svg>`,
-  note: `<svg viewBox="0 0 24 24" fill="var(--fg-info-secondary)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6" fill="white" fill-opacity="0.3"/><path d="M9 13h6m-6 4h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`,
-  hourglass: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--fg-secondary)" stroke-width="2"><path d="M5 3h14M5 21h14M7 3v4l3 3-3 3v4m10-14v4l-3 3 3 3v4"/></svg>`,
-  money: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--fg-secondary)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
-  video: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M22 8l-5 4 5 4V8z"/></svg>`,
-};
-
-function iconHTML(name, color) {
-  if (!name || !ICONS[name]) return '';
-  let svg = ICONS[name];
-  if (color) svg = svg.replace(/currentColor/g, color);
-  return `<span class="icon">${svg}</span>`;
-}
-
-// =========================================================================
-// Renderers
-// =========================================================================
-function getStatus(id) { return STATUSES.find(s => s.id === id); }
-
-function blockClass(colorGroup) {
-  const map = { blue: 'block-blue', green: 'block-green', yellow: 'block-yellow', gray: 'block-gray', unavail: 'block-unavail', slot: 'block-slot', avail: 'block-avail' };
-  return map[colorGroup] || '';
-}
-
-function renderBlock(s) {
-  const cls = ['cal-block', blockClass(s.colorGroup)];
-  if (s.canceled) cls.push('cal-block-canceled');
-  return `<div class="${cls.join(' ')}">
-    ${s.time ? `<div class="cal-block-time">${s.colorGroup === 'slot' ? '' : s.time} ${s.id === 'scheduledBeforeSession' || s.id === 'inProgress' ? '<span class="icon" style="vertical-align:middle">' + ICONS.video + '</span>' : ''}</div>` : ''}
-    <div class="cal-block-header">
-      <div>
-        <div class="cal-block-title">${s.title}</div>
-        ${s.id === 'pending' ? '<div class="cal-block-subtitle">Headway x Zocdoc</div>' : ''}
-      </div>
-      ${s.icon ? `<div class="cal-block-icon">${iconHTML(s.icon)}</div>` : ''}
-    </div>
-  </div>`;
-}
-
-function renderGuidanceCard(card) {
-  return `<div class="guidance-card guidance-${card.cat}">${card.text}</div>`;
-}
-
-function renderPopover(s, extraGuidance) {
-  if (s.noPopover) return '';
-  const payoutLine = s.id === 'paid' ? `${iconHTML('money')} <span class="popover-text">$110.00 payout paid on 3/30/26</span>`
-    : s.id === 'confirmed' ? `${iconHTML('money')} <span class="popover-text">$120.00 payout pending for 4/08/26</span>`
-    : s.id === 'confirmedWithPaymentFailed' ? `${iconHTML('money')} <span class="popover-text">$120.00 payout delayed</span>`
-    : s.id === 'canceled' ? `${iconHTML('money')} <span class="popover-text">No cancellation fee</span>`
-    : '';
-
-  return `<div class="popover">
-    <div class="popover-title">
-      <span class="popover-title-name">${s.isNonSession ? s.title : 'Jane Doe'} ${!s.isNonSession ? '<span style="color:var(--fg-secondary);font-weight:400;font-size:13px">(she/her)</span>' : ''}</span>
-      <span class="popover-title-close">&times;</span>
-    </div>
-    <div class="popover-section">
-      <div class="popover-row">
-        <div class="popover-icon">${ICONS.video}</div>
-        <span class="popover-text">${s.isNonSession ? s.time || 'Block' : 'Telehealth'}</span>
-      </div>
-      ${s.isNonSession && s.id === 'unavailable' ? renderGuidanceCard({cat:'neutral', text:'Clients will not be able to book appointments with you during this time.'}) : ''}
-    </div>
-    ${s.statusText ? `<div class="popover-section">
-      <div class="popover-row">
-        <div class="popover-icon">${ICONS.hourglass}</div>
-        <span class="popover-text">Session status: <strong>${s.statusText}</strong>${s.id === 'paid' ? ' (Paid $110.00 on 3/30/26)' : ''}</span>
-      </div>
-      ${payoutLine ? `<div class="popover-row"><div class="popover-icon"></div>${payoutLine}</div>` : ''}
-      ${s.id === 'canceled' ? `<div class="popover-row"><div class="popover-icon">${iconHTML('x')}</div><span class="popover-text">Client canceled session.</span></div>` : ''}
-      ${s.id === 'supervisorEditsRequested' ? renderGuidanceCard({cat:'warning', text:'Your supervisor shared feedback and requested changes on this session note.'}) : ''}
-      ${s.id === 'confirmedWithPaymentFailed' ? renderGuidanceCard({cat:'error', text:"Payment method was declined, but we'll try again on 03/15/2026. Session confirmation will be blocked if there are 3 failed attempts. Consider asking your client to update their payment method."}) : ''}
-      ${extraGuidance || ''}
-    </div>` : ''}
-    <div class="popover-buttons">
-      ${s.id === 'canceled' ? '<span class="popover-btn">View details</span>'
-        : s.isNonSession ? '<span class="popover-btn" style="color:var(--fg-danger-secondary);border-color:var(--fg-danger-secondary)">Delete</span>'
-        : '<span class="popover-btn popover-btn-primary">Confirm details</span> <span class="popover-btn">Reschedule</span> <span class="popover-btn" style="color:var(--fg-danger-secondary);border-color:var(--fg-danger-secondary)">Cancel</span>'}
-    </div>
-  </div>`;
-}
-
-function renderVariantCard(s, opts = {}) {
-  const label = opts.label || s.label;
-  const sublabel = opts.sublabel || '';
-  const showPopover = !s.noPopover;
-  return `<div class="variant-card">
-    <div class="variant-label">${label}</div>
-    ${sublabel ? `<div class="variant-sublabel">${sublabel}</div>` : ''}
-    <div class="variant-row">
-      <div class="variant-col">
-        <div class="variant-col-label">Calendar block</div>
-        ${renderBlock(s)}
-      </div>
-      ${showPopover ? `<div class="variant-col">
-        <div class="variant-col-label">Event detail popover</div>
-        ${renderPopover(s, opts.extraGuidance)}
-      </div>` : ''}
-    </div>
-  </div>`;
-}
-
-// =========================================================================
-// Tab: By Status
-// =========================================================================
-function renderByStatus() {
-  const container = document.getElementById('tab-status');
-  STATUSES.forEach(s => { container.insertAdjacentHTML('beforeend', renderVariantCard(s)); });
-}
-
-// =========================================================================
-// Tab: By Time Horizon
-// =========================================================================
-function renderByTime() {
-  const container = document.getElementById('tab-time');
-  TIME_GROUPS.forEach(g => {
-    let html = `<div class="section-group"><div class="section-group-header"><h2>${g.label}</h2><p class="description">${g.desc}</p></div>`;
-    g.ids.forEach(id => {
-      const s = getStatus(id);
-      if (s) html += renderVariantCard(s);
-    });
-    html += '</div>';
-    container.insertAdjacentHTML('beforeend', html);
-  });
-}
-
-// =========================================================================
-// Tab: By Guidance Card
-// =========================================================================
-function renderByCards() {
-  const container = document.getElementById('tab-cards');
-  CARD_CATEGORIES.forEach(cat => {
-    const cards = GUIDANCE_CARDS.filter(c => c.cat === cat.cat);
-    if (!cards.length) return;
-    let html = `<div class="section-group"><div class="section-group-header"><h2>${cat.label} (${cards.length})</h2><p class="description">${cat.desc}</p></div>`;
-    cards.forEach(card => {
-      const statusBadges = card.statuses.map(sid => {
-        const s = getStatus(sid);
-        const group = s ? s.colorGroup : 'blue';
-        const badgeClass = group === 'blue' ? 'badge-blue' : group === 'green' ? 'badge-green' : group === 'yellow' ? 'badge-yellow' : 'badge-gray';
-        return `<span class="status-badge ${badgeClass}">${sid}</span>`;
-      }).join('');
-      html += `<div class="variant-card">
-        <div class="variant-label">${card.label}</div>
-        <div class="card-meta">Source: ${card.source}</div>
-        <div class="card-meta" style="margin-bottom:12px">Applies to: ${statusBadges}</div>
-        <div class="variant-row">
-          <div class="variant-col">
-            <div class="variant-col-label">Guidance card</div>
-            <div class="card-standalone">${renderGuidanceCard(card)}</div>
-          </div>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-    container.insertAdjacentHTML('beforeend', html);
-  });
-}
-
-// =========================================================================
-// Tab: By Billing
-// =========================================================================
-function renderByBilling() {
-  const container = document.getElementById('tab-billing');
-  BILLING_SCENARIOS.forEach(scenario => {
-    let html = `<div class="section-group"><div class="section-group-header"><h2>${scenario.label}</h2><p class="description">${scenario.desc}</p></div>`;
-    scenario.statuses.forEach(sid => {
-      const s = getStatus(sid);
-      if (!s) return;
-      let extraGuidance = '';
-      if (scenario.extraCard) {
-        const gc = GUIDANCE_CARDS.find(c => c.id === scenario.extraCard);
-        if (gc && (gc.statuses.includes(sid) || gc.statuses.includes('all session statuses'))) {
-          extraGuidance = renderGuidanceCard(gc);
-        }
-      }
-      html += renderVariantCard(s, { sublabel: scenario.label, extraGuidance });
-    });
-    html += '</div>';
-    container.insertAdjacentHTML('beforeend', html);
-  });
-}
-
-// =========================================================================
-// Init
-// =========================================================================
-renderByStatus();
-renderByTime();
-renderByCards();
-renderByBilling();
-
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
